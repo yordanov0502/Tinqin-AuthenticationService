@@ -1,4 +1,4 @@
-package com.tinqinacademy.authenticationservice.core.exceptions.custom;
+package com.tinqinacademy.authenticationservice.api.exceptions.custom;
 
 import org.springframework.http.HttpStatus;
 

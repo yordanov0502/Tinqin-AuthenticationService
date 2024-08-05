@@ -1,6 +1,6 @@
 package com.tinqinacademy.authenticationservice.core.utils;
 
-import com.tinqinacademy.authenticationservice.core.exceptions.custom.NoMethodFoundException;
+import com.tinqinacademy.authenticationservice.api.exceptions.custom.NoMethodFoundException;
 
 public class LoggingUtils {
     public static String getMethodName() {

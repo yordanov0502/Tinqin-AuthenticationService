@@ -1,9 +1,9 @@
 package com.tinqinacademy.authenticationservice.core.exceptions;
 
-import com.tinqinacademy.authenticationservice.api.error.Error;
-import com.tinqinacademy.authenticationservice.api.error.Errors;
-import com.tinqinacademy.authenticationservice.core.exceptions.custom.CustomException;
-import com.tinqinacademy.authenticationservice.core.exceptions.custom.ViolationsException;
+import com.tinqinacademy.authenticationservice.api.exceptions.Error;
+import com.tinqinacademy.authenticationservice.api.exceptions.Errors;
+import com.tinqinacademy.authenticationservice.api.exceptions.custom.CustomException;
+import com.tinqinacademy.authenticationservice.api.exceptions.custom.ViolationsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 

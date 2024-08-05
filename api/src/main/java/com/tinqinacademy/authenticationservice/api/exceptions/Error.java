@@ -1,4 +1,4 @@
-package com.tinqinacademy.authenticationservice.api.error;
+package com.tinqinacademy.authenticationservice.api.exceptions;
 
 import lombok.*;
 
