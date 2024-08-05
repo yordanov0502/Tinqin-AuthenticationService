@@ -1,7 +1,7 @@
 package com.tinqinacademy.authenticationservice.rest.controllers;
 
 import com.tinqinacademy.authenticationservice.api.base.OperationOutput;
-import com.tinqinacademy.authenticationservice.api.error.Errors;
+import com.tinqinacademy.authenticationservice.api.exceptions.Errors;
 import io.vavr.control.Either;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

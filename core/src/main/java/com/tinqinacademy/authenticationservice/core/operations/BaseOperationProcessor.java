@@ -1,9 +1,9 @@
 package com.tinqinacademy.authenticationservice.core.operations;
 
 import com.tinqinacademy.authenticationservice.api.base.OperationInput;
-import com.tinqinacademy.authenticationservice.api.error.Error;
+import com.tinqinacademy.authenticationservice.api.exceptions.Error;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
-import com.tinqinacademy.authenticationservice.core.exceptions.custom.ViolationsException;
+import com.tinqinacademy.authenticationservice.api.exceptions.custom.ViolationsException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
