@@ -22,7 +22,8 @@ public class RegisterInputToUser extends BaseConverter<RegisterInput, User.UserB
                 .firstName(input.getFirstName())
                 .lastName(input.getLastName())
                 .phoneNumber(input.getPhoneNumber())
-                .dateOfBirth(input.getDateOfBirth());
+                .dateOfBirth(input.getDateOfBirth())
+                .isConfirmed(false);
 
         return newUser;
     }

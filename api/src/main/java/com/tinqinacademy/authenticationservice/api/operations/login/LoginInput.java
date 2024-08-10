@@ -1,8 +1,8 @@
 package com.tinqinacademy.authenticationservice.api.operations.login;
 
 import com.tinqinacademy.authenticationservice.api.base.OperationInput;
-import com.tinqinacademy.authenticationservice.api.validation.user.annotation.PasswordRegex;
-import com.tinqinacademy.authenticationservice.api.validation.user.annotation.UsernameRegex;
+import com.tinqinacademy.authenticationservice.api.validation.user.password.PasswordRegex;
+import com.tinqinacademy.authenticationservice.api.validation.user.username.UsernameRegex;
 import lombok.*;
 
 @Builder(toBuilder = true)

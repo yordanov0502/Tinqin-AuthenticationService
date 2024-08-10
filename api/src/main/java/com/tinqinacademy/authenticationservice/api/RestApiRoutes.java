@@ -4,6 +4,7 @@ public class RestApiRoutes {
     public static final String API = "/api/v1";
 
     public static final String API_AUTH = API+"/auth";
+    public static final String API_INTERNAL = API +"/internal";
 
 
     public static final String LOGIN = API_AUTH+"/login";
@@ -14,7 +15,5 @@ public class RestApiRoutes {
     public static final String PROMOTE = API_AUTH+"/promote";
     public static final String DENOTE = API_AUTH+"/denote";
 
-    public static final String VALIDATE_JWT = API_AUTH+"/jwt";
-    public static final String FIND_BY_ID = API_AUTH+"/{id}";
-
+    public static final String VALIDATE_JWT = API_INTERNAL+"/jwt";
 }

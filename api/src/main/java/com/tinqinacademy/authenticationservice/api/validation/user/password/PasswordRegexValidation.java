@@ -1,6 +1,5 @@
-package com.tinqinacademy.authenticationservice.api.validation.user;
+package com.tinqinacademy.authenticationservice.api.validation.user.password;
 
-import com.tinqinacademy.authenticationservice.api.validation.user.annotation.PasswordRegex;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;

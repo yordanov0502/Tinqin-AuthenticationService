@@ -2,9 +2,9 @@ package com.tinqinacademy.authenticationservice.rest.controllers;
 
 import com.tinqinacademy.authenticationservice.api.RestApiRoutes;
 import com.tinqinacademy.authenticationservice.api.exceptions.Errors;
-import com.tinqinacademy.authenticationservice.api.operations.auth.AuthInput;
-import com.tinqinacademy.authenticationservice.api.operations.auth.AuthOperation;
-import com.tinqinacademy.authenticationservice.api.operations.auth.AuthOutput;
+import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationInput;
+import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationOperation;
+import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationOutput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginInput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOperation;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOutput;
@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.vavr.control.Either;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,7 @@ public class AuthController extends BaseController{
 
     private final LoginOperation loginOperation;
     private final RegisterOperation registerOperation;
-    private final AuthOperation authOperation;
+    private final ConfirmRegistrationOperation confirmRegistrationOperation;
 
     @Operation(summary = "Login.",
             description = "Logins the user and issues a JWT with 5 min validity.")
@@ -51,26 +50,21 @@ public class AuthController extends BaseController{
     })
     @PostMapping(RestApiRoutes.REGISTER)
     public ResponseEntity<?> register(@RequestBody RegisterInput input) {
-        //TODO: Implement sending code on email
         Either<Errors,RegisterOutput> either = registerOperation.process(input);
         return mapToResponseEntity(either,HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Validate JWT.",
-            description = "JWT is validated, and returns true/false whether it is valid or not.")
+    @Operation(summary = "Confirm registration.",
+            description = "Activates user account and allows for login to complete successfully.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Jwt has been validated successfully."),
+            @ApiResponse(responseCode = "200", description = "User account has been activated successfully."),
             @ApiResponse(responseCode = "400", description = "Bad request."),
             @ApiResponse(responseCode = "404", description = "Not found.")
     })
-    @PostMapping(RestApiRoutes.VALIDATE_JWT)
-    public ResponseEntity<?> isJwtValid(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        String jwt = authorizationHeader.substring(7);
-        AuthInput input = AuthInput.builder()
-                .jwt(jwt)
-                .build();
-        Either<Errors, AuthOutput> either = authOperation.process(input);
-         return mapToResponseEntity(either,HttpStatus.OK);
+    @PostMapping(RestApiRoutes.CONFIRM_REGISTRATION)
+    public ResponseEntity<?> confirmRegistration(@RequestBody ConfirmRegistrationInput input) {
+        Either<Errors, ConfirmRegistrationOutput> either = confirmRegistrationOperation.process(input);
+        return mapToResponseEntity(either,HttpStatus.OK);
     }
 
 }
