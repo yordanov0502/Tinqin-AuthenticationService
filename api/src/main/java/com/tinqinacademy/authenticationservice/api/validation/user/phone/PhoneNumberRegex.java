@@ -1,6 +1,6 @@
-package com.tinqinacademy.authenticationservice.api.validation.user.annotation;
+package com.tinqinacademy.authenticationservice.api.validation.user.phone;
 
-import com.tinqinacademy.authenticationservice.api.validation.user.PasswordRegexValidation;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -15,9 +15,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target({FIELD,TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = PasswordRegexValidation.class)
-public @interface PasswordRegex {
-    String message() default "Invalid type of password.";
+@Constraint(validatedBy = PhoneNumberValidation.class)
+public @interface PhoneNumberRegex {
+    String message() default "Invalid type of email.";
 
     Class<?>[] groups() default {};
 

@@ -1,6 +1,7 @@
 package com.tinqinacademy.authenticationservice.core.operations;
 
 import com.tinqinacademy.authenticationservice.api.exceptions.Errors;
+import com.tinqinacademy.authenticationservice.api.exceptions.custom.AccountConfirmationException;
 import com.tinqinacademy.authenticationservice.api.exceptions.custom.LoginException;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginInput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOperation;
@@ -40,6 +41,8 @@ public class LoginOperationProcessor extends BaseOperationProcessor implements L
 
             validate(input);
             User user = checkCredentials(input);
+            checkAccountConfirmation(user);
+
             String generatedJWT = jwtService.generateToken(user);
             LoginOutput output = LoginOutput.builder()
                     .jwt(generatedJWT)
@@ -65,6 +68,16 @@ public class LoginOperationProcessor extends BaseOperationProcessor implements L
         log.info(String.format("End %s %s output: %s", this.getClass().getSimpleName(),LoggingUtils.getMethodName(),input));
 
         return user;
+    }
+
+    public void checkAccountConfirmation(User user){
+        log.info(String.format("Start %s %s input: %s", this.getClass().getSimpleName(),LoggingUtils.getMethodName(),user));
+
+        if(!user.getIsConfirmed()){
+            throw new AccountConfirmationException("User account is not confirmed.");
+        }
+
+        log.info(String.format("End %s %s.", this.getClass().getSimpleName(),LoggingUtils.getMethodName()));
     }
 
 

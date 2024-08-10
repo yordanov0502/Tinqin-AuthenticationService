@@ -1,6 +1,5 @@
-package com.tinqinacademy.authenticationservice.api.validation.user;
+package com.tinqinacademy.authenticationservice.api.validation.user.username;
 
-import com.tinqinacademy.authenticationservice.api.validation.user.annotation.UsernameRegex;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
