@@ -1,6 +1,5 @@
 package com.tinqinacademy.authenticationservice.api.validation.user.password;
 
-import com.tinqinacademy.authenticationservice.api.validation.user.password.PasswordRegexValidation;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

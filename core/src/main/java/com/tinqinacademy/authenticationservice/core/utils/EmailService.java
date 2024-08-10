@@ -1,5 +1,6 @@
 package com.tinqinacademy.authenticationservice.core.utils;
 
+import com.tinqinacademy.authenticationservice.api.exceptions.custom.EmailException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class EmailService {
     private String emailSender;
     private final JavaMailSender javaMailSender;
 
-    public boolean sendEmailForAccountActivation(String userFirstName, String toEmail, String randomGeneratedCode) {
+    public void sendEmailForAccountActivation(String userFirstName, String toEmail, String randomGeneratedCode) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
@@ -33,9 +34,8 @@ public class EmailService {
             helper.setText(htmlMsg, true);
             javaMailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            return false;
+            throw new EmailException("Unexpected error occurred while sending email with account confirmation code.");
         }
-        return true;
     }
 
 

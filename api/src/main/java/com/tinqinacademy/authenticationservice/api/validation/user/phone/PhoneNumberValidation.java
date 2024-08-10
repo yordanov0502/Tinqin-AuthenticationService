@@ -1,6 +1,5 @@
 package com.tinqinacademy.authenticationservice.api.validation.user.phone;
 
-import com.tinqinacademy.authenticationservice.api.validation.user.phone.PhoneNumberRegex;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;

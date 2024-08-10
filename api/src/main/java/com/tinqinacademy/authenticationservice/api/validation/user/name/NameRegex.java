@@ -1,7 +1,6 @@
 package com.tinqinacademy.authenticationservice.api.validation.user.name;
 
 
-import com.tinqinacademy.authenticationservice.api.validation.user.name.NameRegexValidation;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
