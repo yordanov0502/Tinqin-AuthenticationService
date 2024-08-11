@@ -44,8 +44,8 @@ public class AccessInterceptor implements HandlerInterceptor {
 
         if(request.getRequestURI().equals(RestApiRoutes.PROMOTE) || request.getRequestURI().equals(RestApiRoutes.DEMOTE)){
             if(!currUser.get().getRole().toString().equals(Role.ADMIN.toString())){
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Unauthorized.");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("Forbidden.");
                 return false;
             }
         }

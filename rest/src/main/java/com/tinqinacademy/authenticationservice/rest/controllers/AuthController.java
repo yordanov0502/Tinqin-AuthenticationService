@@ -11,6 +11,9 @@ import com.tinqinacademy.authenticationservice.api.operations.confirmregistratio
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginInput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOperation;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOutput;
+import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteInput;
+import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOperation;
+import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOutput;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterInput;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOperation;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOutput;
@@ -31,6 +34,7 @@ public class AuthController extends BaseController{
     private final RegisterOperation registerOperation;
     private final ConfirmRegistrationOperation confirmRegistrationOperation;
     private final ChangePasswordOperation changePasswordOperation;
+    private final PromoteOperation promoteOperation;
 
     @Operation(summary = "Login.",
             description = "Logins the user and issues a JWT with 5 min validity.")
@@ -76,11 +80,27 @@ public class AuthController extends BaseController{
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User password has been changed successfully."),
             @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "401", description = "Unauthorized."),
             @ApiResponse(responseCode = "404", description = "Not found.")
     })
     @PostMapping(RestApiRoutes.CHANGE_PASSWORD)
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordInput input) {
         Either<Errors, ChangePasswordOutput> either = changePasswordOperation.process(input);
+        return mapToResponseEntity(either, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Promote user to admin.",
+            description = "Promotes user to admin and give admin rights. Only admin can promote another user to admin.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User has been successfully promoted to admin."),
+            @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "401", description = "Unauthorized."),
+            @ApiResponse(responseCode = "403", description = "Forbidden."),
+            @ApiResponse(responseCode = "404", description = "Not found.")
+    })
+    @PostMapping(RestApiRoutes.PROMOTE)
+    public ResponseEntity<?> promoteUserToAdmin(@RequestBody PromoteInput input) {
+        Either<Errors, PromoteOutput> either = promoteOperation.process(input);
         return mapToResponseEntity(either, HttpStatus.OK);
     }
 
