@@ -46,6 +46,25 @@ public class JwtService {
         return true;
     }
 
+    public Optional<User> validateJwtAndReturnUser (String jwt){
+        //TODO: add check whether jwt is in the blacklist.
+        String id;
+        String role;
+        try {
+            id = extractId(jwt);
+            role = extractRole(jwt);
+        }
+        catch (InvalidJwtException ex){
+            return Optional.empty();
+        }
+
+        Optional<User> user = userRepository.findById(UUID.fromString(id));
+
+        if(user.isEmpty() || !user.get().getRole().toString().equals(role)) {return Optional.empty();}
+
+        return user;
+    }
+
     public String extractId(String token) {
         return extractClaim(token,Claims::getSubject);
     }

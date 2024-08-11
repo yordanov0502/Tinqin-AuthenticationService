@@ -2,6 +2,9 @@ package com.tinqinacademy.authenticationservice.rest.controllers;
 
 import com.tinqinacademy.authenticationservice.api.RestApiRoutes;
 import com.tinqinacademy.authenticationservice.api.exceptions.Errors;
+import com.tinqinacademy.authenticationservice.api.operations.changepassword.ChangePasswordInput;
+import com.tinqinacademy.authenticationservice.api.operations.changepassword.ChangePasswordOperation;
+import com.tinqinacademy.authenticationservice.api.operations.changepassword.ChangePasswordOutput;
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationInput;
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationOperation;
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationOutput;
@@ -27,6 +30,7 @@ public class AuthController extends BaseController{
     private final LoginOperation loginOperation;
     private final RegisterOperation registerOperation;
     private final ConfirmRegistrationOperation confirmRegistrationOperation;
+    private final ChangePasswordOperation changePasswordOperation;
 
     @Operation(summary = "Login.",
             description = "Logins the user and issues a JWT with 5 min validity.")
@@ -65,6 +69,19 @@ public class AuthController extends BaseController{
     public ResponseEntity<?> confirmRegistration(@RequestBody ConfirmRegistrationInput input) {
         Either<Errors, ConfirmRegistrationOutput> either = confirmRegistrationOperation.process(input);
         return mapToResponseEntity(either,HttpStatus.OK);
+    }
+
+    @Operation(summary = "Change password.",
+            description = "Changes the user password.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User password has been changed successfully."),
+            @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "404", description = "Not found.")
+    })
+    @PostMapping(RestApiRoutes.CHANGE_PASSWORD)
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordInput input) {
+        Either<Errors, ChangePasswordOutput> either = changePasswordOperation.process(input);
+        return mapToResponseEntity(either, HttpStatus.OK);
     }
 
 }
