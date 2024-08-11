@@ -8,6 +8,9 @@ import com.tinqinacademy.authenticationservice.api.operations.changepassword.Cha
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationInput;
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationOperation;
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationOutput;
+import com.tinqinacademy.authenticationservice.api.operations.demote.DemoteInput;
+import com.tinqinacademy.authenticationservice.api.operations.demote.DemoteOperation;
+import com.tinqinacademy.authenticationservice.api.operations.demote.DemoteOutput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginInput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOperation;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOutput;
@@ -35,6 +38,7 @@ public class AuthController extends BaseController{
     private final ConfirmRegistrationOperation confirmRegistrationOperation;
     private final ChangePasswordOperation changePasswordOperation;
     private final PromoteOperation promoteOperation;
+    private final DemoteOperation demoteOperation;
 
     @Operation(summary = "Login.",
             description = "Logins the user and issues a JWT with 5 min validity.")
@@ -89,7 +93,7 @@ public class AuthController extends BaseController{
         return mapToResponseEntity(either, HttpStatus.OK);
     }
 
-    @Operation(summary = "Promote user to admin.",
+    @Operation(summary = "Promote user.",
             description = "Promotes user to admin and give admin rights. Only admin can promote another user to admin.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User has been successfully promoted to admin."),
@@ -101,6 +105,21 @@ public class AuthController extends BaseController{
     @PostMapping(RestApiRoutes.PROMOTE)
     public ResponseEntity<?> promoteUserToAdmin(@RequestBody PromoteInput input) {
         Either<Errors, PromoteOutput> either = promoteOperation.process(input);
+        return mapToResponseEntity(either, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Demote admin.",
+            description = "Removes admin privileges of any user. System must always have at least 1 admin. Admin cannot demote theirself.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Admin has been successfully demoted to user."),
+            @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "401", description = "Unauthorized."),
+            @ApiResponse(responseCode = "403", description = "Forbidden."),
+            @ApiResponse(responseCode = "404", description = "Not found.")
+    })
+    @PostMapping(RestApiRoutes.DEMOTE)
+    public ResponseEntity<?> demoteAdminToUser(@RequestBody DemoteInput input) {
+        Either<Errors, DemoteOutput> either = demoteOperation.process(input);
         return mapToResponseEntity(either, HttpStatus.OK);
     }
 
