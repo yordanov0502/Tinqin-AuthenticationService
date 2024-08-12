@@ -20,6 +20,9 @@ import com.tinqinacademy.authenticationservice.api.operations.logout.LogoutOutpu
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteInput;
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOperation;
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOutput;
+import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.RecoverPasswordInput;
+import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.RecoverPasswordOperation;
+import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.RecoverPasswordOutput;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterInput;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOperation;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOutput;
@@ -38,6 +41,7 @@ public class AuthController extends BaseController{
 
     private final LoginOperation loginOperation;
     private final RegisterOperation registerOperation;
+    private final RecoverPasswordOperation recoverPasswordOperation;
     private final ConfirmRegistrationOperation confirmRegistrationOperation;
     private final ChangePasswordOperation changePasswordOperation;
     private final PromoteOperation promoteOperation;
@@ -68,6 +72,19 @@ public class AuthController extends BaseController{
     public ResponseEntity<?> register(@RequestBody RegisterInput input) {
         Either<Errors,RegisterOutput> either = registerOperation.process(input);
         return mapToResponseEntity(either,HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Recover password.",
+            description = "Always gives 200 code. Sends email with new random generated password only if the email is registered to a user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New random generated password has been successfully processed."),
+            @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "404", description = "Not found.")
+    })
+    @PostMapping(RestApiRoutes.RECOVER_PASSWORD)
+    public ResponseEntity<?> recoverPassword(@RequestBody RecoverPasswordInput input) {
+        Either<Errors, RecoverPasswordOutput> either = recoverPasswordOperation.process(input);
+        return mapToResponseEntity(either,HttpStatus.OK);
     }
 
     @Operation(summary = "Confirm registration.",
