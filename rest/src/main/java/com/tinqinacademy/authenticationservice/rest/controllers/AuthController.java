@@ -14,6 +14,9 @@ import com.tinqinacademy.authenticationservice.api.operations.demote.DemoteOutpu
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginInput;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOperation;
 import com.tinqinacademy.authenticationservice.api.operations.login.LoginOutput;
+import com.tinqinacademy.authenticationservice.api.operations.logout.LogoutInput;
+import com.tinqinacademy.authenticationservice.api.operations.logout.LogoutOperation;
+import com.tinqinacademy.authenticationservice.api.operations.logout.LogoutOutput;
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteInput;
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOperation;
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOutput;
@@ -39,6 +42,7 @@ public class AuthController extends BaseController{
     private final ChangePasswordOperation changePasswordOperation;
     private final PromoteOperation promoteOperation;
     private final DemoteOperation demoteOperation;
+    private final LogoutOperation logoutOperation;
 
     @Operation(summary = "Login.",
             description = "Logins the user and issues a JWT with 5 min validity.")
@@ -122,5 +126,21 @@ public class AuthController extends BaseController{
         Either<Errors, DemoteOutput> either = demoteOperation.process(input);
         return mapToResponseEntity(either, HttpStatus.OK);
     }
+
+    @Operation(summary = "Logout.",
+            description = "Logouts the user and adds his JWT to a blacklist.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User has logged out successfully."),
+            @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "401", description = "Unauthorized."),
+            @ApiResponse(responseCode = "404", description = "Not found.")
+    })
+    @PostMapping(RestApiRoutes.LOGOUT)
+    public ResponseEntity<?> logout() {
+        LogoutInput input = LogoutInput.builder().build();
+        Either<Errors, LogoutOutput> either = logoutOperation.process(input);
+        return mapToResponseEntity(either,HttpStatus.OK);
+    }
+
 
 }

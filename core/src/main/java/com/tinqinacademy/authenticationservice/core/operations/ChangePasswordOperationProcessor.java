@@ -7,7 +7,7 @@ import com.tinqinacademy.authenticationservice.api.operations.changepassword.Cha
 import com.tinqinacademy.authenticationservice.api.operations.changepassword.ChangePasswordOutput;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
-import com.tinqinacademy.authenticationservice.persistence.model.contect.UserContext;
+import com.tinqinacademy.authenticationservice.persistence.model.context.UserContext;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.repository.UserRepository;
 import io.vavr.control.Either;

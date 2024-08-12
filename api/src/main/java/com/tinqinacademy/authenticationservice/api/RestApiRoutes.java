@@ -14,6 +14,7 @@ public class RestApiRoutes {
     public static final String CHANGE_PASSWORD = API_AUTH+"/change-password";
     public static final String PROMOTE = API_AUTH+"/promote";
     public static final String DEMOTE = API_AUTH+"/demote";
+    public static final String LOGOUT = API_AUTH+"/logout";
 
     public static final String VALIDATE_JWT = API_INTERNAL+"/jwt";
 }
