@@ -6,7 +6,7 @@ import com.tinqinacademy.authenticationservice.api.operations.register.RegisterI
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOperation;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOutput;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
-import com.tinqinacademy.authenticationservice.core.utils.CodeGenerator;
+import com.tinqinacademy.authenticationservice.core.utils.ContentGenerator;
 import com.tinqinacademy.authenticationservice.core.utils.EmailService;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.AccountCode;
@@ -30,15 +30,15 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     private final UserRepository userRepository;
     private final AccountCodeRepository accountCodeRepository;
     private final EmailService emailService;
-    private final CodeGenerator codeGenerator;
+    private final ContentGenerator contentGenerator;
 
-    public RegisterOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository, AccountCodeRepository accountCodeRepository, EmailService emailService, CodeGenerator codeGenerator) {
+    public RegisterOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository, AccountCodeRepository accountCodeRepository, EmailService emailService, ContentGenerator contentGenerator) {
         super(conversionService, exceptionService, validator);
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.accountCodeRepository = accountCodeRepository;
         this.emailService = emailService;
-        this.codeGenerator = codeGenerator;
+        this.contentGenerator = contentGenerator;
     }
 
     @Transactional
@@ -56,7 +56,7 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
                             .build();
                     User newUser = userRepository.save(user);
 
-                    String generatedCode = codeGenerator.generateRandomCode();
+                    String generatedCode = contentGenerator.generateRandomCode();
                     AccountCode accountConfirmationCode = AccountCode.builder()
                             .code(generatedCode)
                             .email(newUser.getEmail())

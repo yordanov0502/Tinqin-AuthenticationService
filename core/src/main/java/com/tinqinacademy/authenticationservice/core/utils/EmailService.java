@@ -38,5 +38,27 @@ public class EmailService {
         }
     }
 
+    public void sendEmailWithNewPassword(String userFirstName, String toEmail, String newRandomGeneratedPassword) {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
+            helper.setFrom(emailSender);
+            helper.setTo(toEmail);
+            helper.setSubject("New password");
+
+            String htmlMsg = "<h2>Dear " + userFirstName + "!</h2>" +
+                    "<p>You receive this email, because you have recently sent a request for password recovery.</p>" +
+                    "<p>We cannot provide you with information about your current password, because it will violate the GDPR policy.</p>" +
+                    "<p>However, we can provide you with a new password, so you can access your account.</p>" +
+                    "<p><b>This is your new password: <span style='color:blue;'>" + newRandomGeneratedPassword+ "</span></b></p>" +
+                    "<p>We kindly advise you to change your password as soon as you gain access to your account.</p>" +
+                    "<p>Yours faithfully,<br>The Hotel Service Team.</p>";
+            helper.setText(htmlMsg, true);
+            javaMailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new EmailException("Unexpected error occurred while sending email with new password.");
+        }
+    }
+
 
 }
