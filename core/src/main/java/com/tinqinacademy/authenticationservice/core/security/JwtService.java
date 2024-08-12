@@ -1,6 +1,7 @@
 package com.tinqinacademy.authenticationservice.core.security;
 
 import com.tinqinacademy.authenticationservice.api.exceptions.custom.InvalidJwtException;
+import com.tinqinacademy.authenticationservice.core.utils.JwtBlacklistCacheService;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -25,10 +26,10 @@ public class JwtService {
     @Value("${spring.security.jwt.secret}")
     private String SECRET_KEY;
     private final UserRepository userRepository;
+    private final JwtBlacklistCacheService jwtBlacklist;
 
 
     public boolean validateJwt (String jwt){
-        //TODO: add check whether jwt is in the blacklist.
         String id;
         String role;
         try {
@@ -39,6 +40,8 @@ public class JwtService {
             return false;
         }
 
+        if(jwtBlacklist.existsInCache(jwt)){return false;}
+
         Optional<User> user = userRepository.findById(UUID.fromString(id));
 
         if(user.isEmpty() || !user.get().getRole().toString().equals(role)) {return false;}
@@ -47,7 +50,6 @@ public class JwtService {
     }
 
     public Optional<User> validateJwtAndReturnUser (String jwt){
-        //TODO: add check whether jwt is in the blacklist.
         String id;
         String role;
         try {
@@ -57,6 +59,8 @@ public class JwtService {
         catch (InvalidJwtException ex){
             return Optional.empty();
         }
+
+        if(jwtBlacklist.existsInCache(jwt)){return Optional.empty();}
 
         Optional<User> user = userRepository.findById(UUID.fromString(id));
 
@@ -94,13 +98,8 @@ public class JwtService {
     }
 
     public String generateToken(User user){
-        return generateToken(new HashMap<>(), user);
-    }
-
-    private String generateToken(Map<String,Object> extraClaims, User user){
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
                 .setSubject(user.getId().toString())
                 .claim("role",user.getRole().toString())
                 .setIssuedAt(new Date())

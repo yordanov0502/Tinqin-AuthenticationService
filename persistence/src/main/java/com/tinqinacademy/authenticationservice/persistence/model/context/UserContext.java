@@ -1,4 +1,4 @@
-package com.tinqinacademy.authenticationservice.persistence.model.contect;
+package com.tinqinacademy.authenticationservice.persistence.model.context;
 
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import lombok.Getter;
@@ -12,4 +12,5 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class UserContext {
     private User currAuthorizedUser;
+    private String jwt;
 }

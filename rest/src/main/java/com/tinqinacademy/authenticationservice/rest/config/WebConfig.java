@@ -15,6 +15,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(accessInterceptor).addPathPatterns(RestApiRoutes.CHANGE_PASSWORD,RestApiRoutes.PROMOTE,RestApiRoutes.DEMOTE);
+        registry.addInterceptor(accessInterceptor).addPathPatterns(RestApiRoutes.CHANGE_PASSWORD,RestApiRoutes.PROMOTE,RestApiRoutes.DEMOTE, RestApiRoutes.LOGOUT);
     }
 }

@@ -2,12 +2,13 @@ package com.tinqinacademy.authenticationservice.rest.interceptors;
 
 import com.tinqinacademy.authenticationservice.api.RestApiRoutes;
 import com.tinqinacademy.authenticationservice.core.security.JwtService;
-import com.tinqinacademy.authenticationservice.persistence.model.contect.UserContext;
+import com.tinqinacademy.authenticationservice.persistence.model.context.UserContext;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.model.enums.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -21,6 +22,10 @@ public class AccessInterceptor implements HandlerInterceptor {
 
     private final JwtService jwtService;
     private final UserContext userContext;
+    @Value("${env.REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER}")
+    private String REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER;
+    @Value("${env.REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER_VALUE}")
+    private String REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER_VALUE;
 
 
     @Override
@@ -39,6 +44,10 @@ public class AccessInterceptor implements HandlerInterceptor {
         if(currUser.isEmpty()){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized.");
+
+            if (request.getRequestURI().equals(RestApiRoutes.LOGOUT)){
+                response.setHeader(REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER,REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER_VALUE);
+            }
             return false;
         }
 
@@ -51,6 +60,7 @@ public class AccessInterceptor implements HandlerInterceptor {
         }
 
         userContext.setCurrAuthorizedUser(currUser.get());
+        userContext.setJwt(jwt);
         return true;
     }
 
