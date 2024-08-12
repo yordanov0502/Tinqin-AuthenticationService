@@ -1,6 +1,7 @@
 package com.tinqinacademy.authenticationservice.api.operations.register;
 
 import com.tinqinacademy.authenticationservice.api.base.OperationInput;
+import com.tinqinacademy.authenticationservice.api.validation.user.dateofbirth.DateOfBirth;
 import com.tinqinacademy.authenticationservice.api.validation.user.name.NameRegex;
 import com.tinqinacademy.authenticationservice.api.validation.user.password.PasswordRegex;
 import com.tinqinacademy.authenticationservice.api.validation.user.phone.PhoneNumberRegex;
@@ -32,6 +33,6 @@ public class RegisterInput implements OperationInput {
     private String email;
     @PhoneNumberRegex
     private String phoneNumber;
-    @NotNull
+    @DateOfBirth
     private LocalDate dateOfBirth;
 }
