@@ -26,6 +26,7 @@ import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.Re
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterInput;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOperation;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOutput;
+import com.tinqinacademy.authenticationservice.rest.security.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController extends BaseController{
 
+    private final UserContext userContext;
     private final LoginOperation loginOperation;
     private final RegisterOperation registerOperation;
     private final RecoverPasswordOperation recoverPasswordOperation;
@@ -109,7 +111,11 @@ public class AuthController extends BaseController{
             @ApiResponse(responseCode = "404", description = "Not found.")
     })
     @PostMapping(RestApiRoutes.CHANGE_PASSWORD)
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordInput input) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordInput inputArg) {
+        ChangePasswordInput input = inputArg.toBuilder()
+                .userContextOldPassword(userContext.getCurrAuthorizedUser().getPassword())
+                .userContextEmail(userContext.getCurrAuthorizedUser().getEmail())
+                .build();
         Either<Errors, ChangePasswordOutput> either = changePasswordOperation.process(input);
         return mapToResponseEntity(either, HttpStatus.OK);
     }
@@ -124,7 +130,10 @@ public class AuthController extends BaseController{
             @ApiResponse(responseCode = "404", description = "Not found.")
     })
     @PostMapping(RestApiRoutes.PROMOTE)
-    public ResponseEntity<?> promoteUserToAdmin(@RequestBody PromoteInput input) {
+    public ResponseEntity<?> promoteUserToAdmin(@RequestBody PromoteInput inputArg) {
+        PromoteInput input = inputArg.toBuilder()
+                .userContextId(userContext.getCurrAuthorizedUser().getId())
+                .build();
         Either<Errors, PromoteOutput> either = promoteOperation.process(input);
         return mapToResponseEntity(either, HttpStatus.OK);
     }
@@ -139,7 +148,10 @@ public class AuthController extends BaseController{
             @ApiResponse(responseCode = "404", description = "Not found.")
     })
     @PostMapping(RestApiRoutes.DEMOTE)
-    public ResponseEntity<?> demoteAdminToUser(@RequestBody DemoteInput input) {
+    public ResponseEntity<?> demoteAdminToUser(@RequestBody DemoteInput inputArg) {
+        DemoteInput input = inputArg.toBuilder()
+                .userContextId(userContext.getCurrAuthorizedUser().getId())
+                .build();
         Either<Errors, DemoteOutput> either = demoteOperation.process(input);
         return mapToResponseEntity(either, HttpStatus.OK);
     }
@@ -154,7 +166,10 @@ public class AuthController extends BaseController{
     })
     @PostMapping(RestApiRoutes.LOGOUT)
     public ResponseEntity<?> logout() {
-        LogoutInput input = LogoutInput.builder().build();
+        LogoutInput input = LogoutInput.builder()
+                .jwt(userContext.getJwt())
+                .userContextId(userContext.getCurrAuthorizedUser().getId().toString())
+                .build();
         Either<Errors, LogoutOutput> either = logoutOperation.process(input);
         return mapToResponseEntity(either,HttpStatus.OK);
     }

@@ -1,5 +1,6 @@
 package com.tinqinacademy.authenticationservice.api.operations.changepassword;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tinqinacademy.authenticationservice.api.base.OperationInput;
 import com.tinqinacademy.authenticationservice.api.validation.user.password.PasswordRegex;
 import jakarta.validation.constraints.Email;
@@ -21,4 +22,9 @@ public class ChangePasswordInput implements OperationInput {
     @NotBlank
     @Email
     private String email;
+
+    @JsonIgnore
+    private String userContextOldPassword;
+    @JsonIgnore
+    private String userContextEmail;
 }

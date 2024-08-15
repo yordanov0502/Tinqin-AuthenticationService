@@ -8,7 +8,6 @@ import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOpe
 import com.tinqinacademy.authenticationservice.api.operations.promote.PromoteOutput;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
-import com.tinqinacademy.authenticationservice.persistence.model.context.UserContext;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.model.enums.Role;
 import com.tinqinacademy.authenticationservice.persistence.repository.UserRepository;
@@ -25,12 +24,10 @@ import java.util.UUID;
 @Service
 public class PromoteOperationProcessor extends BaseOperationProcessor implements PromoteOperation {
 
-    private final UserContext userContext;
     private final UserRepository userRepository;
 
-    public PromoteOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, UserContext userContext, UserRepository userRepository) {
+    public PromoteOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, UserRepository userRepository) {
         super(conversionService, exceptionService, validator);
-        this.userContext = userContext;
         this.userRepository = userRepository;
     }
 
@@ -60,7 +57,7 @@ public class PromoteOperationProcessor extends BaseOperationProcessor implements
         User userForPromotion = userRepository.findById(UUID.fromString(input.getUserId()))
                 .orElseThrow(() -> new NotFoundException(String.format("User with id: %s doesn't exist", input.getUserId())));
 
-        if (userForPromotion.getId().equals(userContext.getCurrAuthorizedUser().getId())) {
+        if (userForPromotion.getId().equals(input.getUserContextId())) {
             throw new PromotionException("You cannot promote yourself to admin, because you are admin.");
         }
 

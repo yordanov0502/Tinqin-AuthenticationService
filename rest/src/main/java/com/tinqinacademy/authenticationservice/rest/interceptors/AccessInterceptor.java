@@ -2,7 +2,7 @@ package com.tinqinacademy.authenticationservice.rest.interceptors;
 
 import com.tinqinacademy.authenticationservice.api.RestApiRoutes;
 import com.tinqinacademy.authenticationservice.core.security.JwtService;
-import com.tinqinacademy.authenticationservice.persistence.model.context.UserContext;
+import com.tinqinacademy.authenticationservice.rest.security.UserContext;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.model.enums.Role;
 import jakarta.servlet.http.HttpServletRequest;
