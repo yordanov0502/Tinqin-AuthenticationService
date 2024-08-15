@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -34,33 +35,28 @@ public class AccessInterceptor implements HandlerInterceptor {
         final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized.");
+            response.sendError(401,HttpStatus.UNAUTHORIZED.getReasonPhrase());
             return false;
         }
 
         String jwt = authorizationHeader.substring(7);
         Optional<User> currUser = jwtService.validateJwtAndReturnUser(jwt);
         if(currUser.isEmpty()){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized.");
-
             if (request.getRequestURI().equals(RestApiRoutes.LOGOUT)){
                 response.setHeader(REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER,REDIRECT_TO_LOGIN_PAGE_RESPONSE_HEADER_VALUE);
             }
+            response.sendError(401,HttpStatus.UNAUTHORIZED.getReasonPhrase());
             return false;
         }
 
         if(request.getRequestURI().equals(RestApiRoutes.PROMOTE) || request.getRequestURI().equals(RestApiRoutes.DEMOTE)){
             if(!currUser.get().getRole().toString().equals(Role.ADMIN.toString())){
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.getWriter().write("Forbidden.");
+                response.sendError(403,HttpStatus.FORBIDDEN.getReasonPhrase());
                 return false;
             }
         }
 
-        userContext.setCurrAuthorizedUser(currUser.get());
-        userContext.setJwt(jwt);
+        userContext.setContext(currUser.get(),jwt);
         return true;
     }
 
