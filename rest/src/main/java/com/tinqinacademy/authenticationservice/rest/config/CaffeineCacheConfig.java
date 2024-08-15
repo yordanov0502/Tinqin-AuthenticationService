@@ -14,10 +14,14 @@ import java.util.Collections;
 @Configuration
 public class CaffeineCacheConfig {
 
-    @Value("${env.JWT_BLACKLIST}")
-    private String JWT_BLACKLIST;
-    @Value("${env.JWT_BLACKLIST_DURATION}")
-    private static int JWT_BLACKLIST_DURATION;
+    private static int CACHE_ENTRY_DURATION;
+    private final String JWT_BLACKLIST;
+
+    public CaffeineCacheConfig(@Value("${env.JWT_BLACKLIST}") String JWT_BLACKLIST,
+                               @Value("${env.CACHE_ENTRY_DURATION}") int cacheEntryDuration) {
+        this.JWT_BLACKLIST = JWT_BLACKLIST;
+        CACHE_ENTRY_DURATION = cacheEntryDuration;
+    }
 
     @Bean
     public CacheManager cacheManager() {
@@ -33,7 +37,7 @@ public class CaffeineCacheConfig {
 
     private static Cache<Object,Object> jwtBlacklist() {
         return Caffeine.newBuilder()
-                .expireAfterWrite(Duration.ofMinutes(JWT_BLACKLIST_DURATION))
+                .expireAfterWrite(Duration.ofMinutes(CACHE_ENTRY_DURATION))
                 .build();
     }
 
