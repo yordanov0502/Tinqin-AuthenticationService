@@ -1,5 +1,6 @@
 package com.tinqinacademy.authenticationservice.api.operations.promote;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tinqinacademy.authenticationservice.api.base.OperationInput;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -15,4 +16,7 @@ public class PromoteInput implements OperationInput {
     @NotBlank
     @UUID
     private String userId;
+
+    @JsonIgnore
+    private java.util.UUID userContextId;
 }

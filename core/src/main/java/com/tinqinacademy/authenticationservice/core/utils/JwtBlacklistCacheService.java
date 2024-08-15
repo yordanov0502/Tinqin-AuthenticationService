@@ -2,6 +2,7 @@ package com.tinqinacademy.authenticationservice.core.utils;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,11 @@ import org.springframework.stereotype.Service;
 public class JwtBlacklistCacheService {
 
     private final CacheManager cacheManager;
+    @Value("${env.JWT_BLACKLIST}")
+    private String JWT_BLACKLIST;
 
     private Cache<Object, Object> getCaffeineCache() {
-        org.springframework.cache.Cache springCache = cacheManager.getCache("jwtBlacklist");
+        org.springframework.cache.Cache springCache = cacheManager.getCache(JWT_BLACKLIST);
         if (springCache instanceof CaffeineCache) {
             return ((CaffeineCache) springCache).getNativeCache();
         }

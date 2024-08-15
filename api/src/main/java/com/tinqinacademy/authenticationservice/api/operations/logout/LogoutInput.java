@@ -1,5 +1,6 @@
 package com.tinqinacademy.authenticationservice.api.operations.logout;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tinqinacademy.authenticationservice.api.base.OperationInput;
 import lombok.*;
 
@@ -7,7 +8,11 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-//@AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 public class LogoutInput implements OperationInput {
+    @JsonIgnore
+    private String jwt;
+    @JsonIgnore
+    private String userContextId;
 }

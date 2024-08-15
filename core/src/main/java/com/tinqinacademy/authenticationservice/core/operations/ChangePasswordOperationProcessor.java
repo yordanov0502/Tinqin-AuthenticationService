@@ -7,7 +7,6 @@ import com.tinqinacademy.authenticationservice.api.operations.changepassword.Cha
 import com.tinqinacademy.authenticationservice.api.operations.changepassword.ChangePasswordOutput;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
-import com.tinqinacademy.authenticationservice.persistence.model.context.UserContext;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.repository.UserRepository;
 import io.vavr.control.Either;
@@ -22,13 +21,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChangePasswordOperationProcessor extends BaseOperationProcessor implements ChangePasswordOperation {
 
-    private final UserContext userContext;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public ChangePasswordOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, UserContext userContext, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public ChangePasswordOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository) {
         super(conversionService, exceptionService, validator);
-        this.userContext = userContext;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
     }
@@ -41,7 +38,7 @@ public class ChangePasswordOperationProcessor extends BaseOperationProcessor imp
                     validate(input);
                     validatePasswords(input);
 
-                    User currUser = userContext.getCurrAuthorizedUser();
+                    User currUser = userRepository.findByEmail(input.getUserContextEmail()).get(); //? User context is checked and set in access interceptor, so NO exception will ever occur here
                     String newPassword = passwordEncoder.encode(input.getNewPassword());
                     currUser.setPassword(newPassword);
                     userRepository.save(currUser);
@@ -61,11 +58,11 @@ public class ChangePasswordOperationProcessor extends BaseOperationProcessor imp
             throw new PasswordException("New password must be different than the old password.");
         }
 
-        if(!passwordEncoder.matches(input.getOldPassword(),userContext.getCurrAuthorizedUser().getPassword())){
+        if(!passwordEncoder.matches(input.getOldPassword(),input.getUserContextOldPassword())){
             throw new PasswordException("Wrong old password.");
         }
 
-        if(!input.getEmail().equals(userContext.getCurrAuthorizedUser().getEmail())){
+        if(!input.getEmail().equals(input.getUserContextEmail())){
             throw new PasswordException("Wrong email.");
         }
 
