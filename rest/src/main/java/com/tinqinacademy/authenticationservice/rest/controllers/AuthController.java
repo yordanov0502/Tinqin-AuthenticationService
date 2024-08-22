@@ -26,6 +26,9 @@ import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.Re
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterInput;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOperation;
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOutput;
+import com.tinqinacademy.authenticationservice.api.operations.resetpassword.ResetPasswordInput;
+import com.tinqinacademy.authenticationservice.api.operations.resetpassword.ResetPasswordOperation;
+import com.tinqinacademy.authenticationservice.api.operations.resetpassword.ResetPasswordOutput;
 import com.tinqinacademy.authenticationservice.rest.security.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -44,6 +47,7 @@ public class AuthController extends BaseController{
     private final LoginOperation loginOperation;
     private final RegisterOperation registerOperation;
     private final RecoverPasswordOperation recoverPasswordOperation;
+    private final ResetPasswordOperation resetPasswordOperation;
     private final ConfirmRegistrationOperation confirmRegistrationOperation;
     private final ChangePasswordOperation changePasswordOperation;
     private final PromoteOperation promoteOperation;
@@ -77,9 +81,9 @@ public class AuthController extends BaseController{
     }
 
     @Operation(summary = "Recover password.",
-            description = "Always gives 200 code. Sends email with new random generated password only if the email is registered to a user.")
+            description = "Always gives 200 code. Sends email with password recovery code only if the email is registered to a user.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "New random generated password has been successfully processed."),
+            @ApiResponse(responseCode = "200", description = "New password recovery code has been successfully processed."),
             @ApiResponse(responseCode = "400", description = "Bad request."),
             @ApiResponse(responseCode = "404", description = "Not found.")
     })
@@ -88,6 +92,20 @@ public class AuthController extends BaseController{
         Either<Errors, RecoverPasswordOutput> either = recoverPasswordOperation.process(input);
         return mapToResponseEntity(either,HttpStatus.OK);
     }
+
+    @Operation(summary = "Reset password.",
+            description = "User can change their password, only if they provide valid password recovery code.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User has reset their password successfully."),
+            @ApiResponse(responseCode = "400", description = "Bad request."),
+            @ApiResponse(responseCode = "404", description = "Not found.")
+    })
+    @PostMapping(RestApiRoutes.RESET_PASSWORD)
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordInput input) {
+        Either<Errors, ResetPasswordOutput> either = resetPasswordOperation.process(input);
+        return mapToResponseEntity(either,HttpStatus.OK);
+    }
+
 
     @Operation(summary = "Confirm registration.",
             description = "Activates user account and allows for login to complete successfully.")

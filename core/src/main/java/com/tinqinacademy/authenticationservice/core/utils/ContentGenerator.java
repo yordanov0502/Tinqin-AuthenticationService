@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class ContentGenerator {
 
     private final AccountCodeRepository accountCodeRepository;
+    private final PasswordRecoveryCodesCacheSerivce passwordRecoveryCodesCacheSerivce;
 
     public String generateRandomCode() {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -26,24 +27,15 @@ public class ContentGenerator {
         return randomCode;
     }
 
-    public String generateRandomPassword() {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&+=_*~!)(./:;?{}|`',-";
-        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_*~!)(./:;?{}|`',-])[0-9a-zA-Z@#$%^&+=_*~!)(./:;?{}|`',-]{8,30}$";
-        Pattern pattern = Pattern.compile(regex);
-        int counter = 0;
-
-        while (true)
-        {
-            if(counter>=300) {throw new PasswordException("Unexpected error occurred. Please try again.");}
-            else
-            {
-                counter++;
-                String generatedPassword = RandomStringUtils.random(12, characters);
-                Matcher matcher = pattern.matcher(generatedPassword);
-                if(matcher.matches()) {
-                    return generatedPassword;}
-            }
+    public String generatePasswordRecoveryCode() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXY0123456789";
+        int length = 12;
+        String passwordRecoveryCode;
+        do{
+            passwordRecoveryCode = RandomStringUtils.random(length,characters);
         }
+        while (passwordRecoveryCodesCacheSerivce.existsInCache(passwordRecoveryCode));
+        return passwordRecoveryCode;
     }
 
 }

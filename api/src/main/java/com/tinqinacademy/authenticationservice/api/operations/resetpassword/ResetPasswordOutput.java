@@ -1,4 +1,4 @@
-package com.tinqinacademy.authenticationservice.api.operations.changepassword;
+package com.tinqinacademy.authenticationservice.api.operations.resetpassword;
 
 import com.tinqinacademy.authenticationservice.api.base.OperationOutput;
 import lombok.*;
@@ -8,5 +8,5 @@ import lombok.*;
 @Setter
 @ToString
 @NoArgsConstructor
-public class ChangePasswordOutput implements OperationOutput {
+public class ResetPasswordOutput implements OperationOutput {
 }
