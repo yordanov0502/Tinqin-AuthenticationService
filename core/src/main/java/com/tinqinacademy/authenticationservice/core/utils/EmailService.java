@@ -4,11 +4,17 @@ import com.tinqinacademy.authenticationservice.api.exceptions.custom.EmailExcept
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -17,6 +23,12 @@ public class EmailService {
     private String emailSender;
     private final JavaMailSender javaMailSender;
 
+    @Async
+    @Retryable(
+            value = {Exception.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 3000)
+    )
     public void sendEmailForAccountActivation(String userFirstName, String toEmail, String randomGeneratedCode) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
@@ -38,6 +50,12 @@ public class EmailService {
         }
     }
 
+    @Async
+    @Retryable(
+            value = {Exception.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 3000)
+    )
     public void sendEmailWithPasswordRecoveryCode(String userFirstName, String toEmail, String passwordRecoveryCode) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
@@ -57,5 +75,9 @@ public class EmailService {
         }
     }
 
+    @Recover
+    private void recover(Exception exception, String userFirstName, String toEmail, String passwordRecoveryCode) {
+        log.error(String.format("Error occurred while sending email to %s. Exception: %s",toEmail,exception));
+    }
 
 }
