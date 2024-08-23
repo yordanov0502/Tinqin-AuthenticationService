@@ -1,6 +1,9 @@
 package com.tinqinacademy.authenticationservice.rest.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import com.tinqinacademy.authenticationservice.api.RestApiRoutes;
 import com.tinqinacademy.authenticationservice.api.operations.changepassword.ChangePasswordInput;
 import com.tinqinacademy.authenticationservice.api.operations.confirmregistration.ConfirmRegistrationInput;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -50,12 +54,21 @@ class AuthControllerTest {
     @Autowired
     private JwtService jwtService;
 
+    @RegisterExtension
+    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+            .withConfiguration(GreenMailConfiguration.aConfig()
+                    .withUser("testuser@example.com", "password123")
+                    .withUser("testuser1@example.com", "password1234")
+                    .withUser("testuser2@example.com", "password12345")
+                    .withUser("testuser3@example.com", "password123456"))
+            .withPerMethodLifecycle(true);
+
     @BeforeEach
     void setUp() {
         User user = User.builder()
                 .role(Role.ADMIN)
                 .username("yordanov4.0")
-                .email("yordanovtodor281@gmail.com")
+                .email("testuser@example.com")
                 .password(passwordEncoder.encode("1234ABCDefgh****"))
                 .firstName("Тодор")
                 .lastName("Йорданов")
@@ -69,7 +82,7 @@ class AuthControllerTest {
         User user1 = User.builder()
                 .role(Role.USER)
                 .username("emo4.0")
-                .email("natoto01@abv.bg")
+                .email("testuser1@example.com")
                 .password(passwordEncoder.encode("1234ABCDefgh****"))
                 .firstName("Емил")
                 .lastName("Ефтимов")
@@ -143,7 +156,7 @@ class AuthControllerTest {
                 .password("1234ABCDefgh****")
                 .firstName("Емил")
                 .lastName("Ефтимов")
-                .email("oblakanatosho1@gmail.com")
+                .email("testuser2@example.com")
                 .phoneNumber("0897652431")
                 .dateOfBirth(LocalDate.of(2001,9,7))
                 .build();
@@ -190,7 +203,7 @@ class AuthControllerTest {
     @Test
     void recoverPasswordOk() throws Exception {
         RecoverPasswordInput input = RecoverPasswordInput.builder()
-                .email("natoto01@abv.bg")
+                .email("testuser1@example.com")
                 .build();
 
         String serializedInput = mapper.writeValueAsString(input);
@@ -290,13 +303,13 @@ class AuthControllerTest {
 
     @Test
     void changePasswordOk() throws Exception {
-        User testUser = userRepository.findByEmail("yordanovtodor281@gmail.com").get();
+        User testUser = userRepository.findByEmail("testuser@example.com").get();
         String authHeader = "Bearer " + jwtService.generateToken(testUser);
 
         ChangePasswordInput input = ChangePasswordInput.builder()
                 .oldPassword("1234ABCDefgh****")
                 .newPassword("4321ABCDefgh****")
-                .email("yordanovtodor281@gmail.com")
+                .email("testuser@example.com")
                 .build();
 
         String serializedInput = mapper.writeValueAsString(input);
@@ -314,7 +327,7 @@ class AuthControllerTest {
         ChangePasswordInput input = ChangePasswordInput.builder()
                 .oldPassword("1234ABCDefgh****")
                 .newPassword("4321ABCDefgh****")
-                .email("yordanovtodor281@gmail.com")
+                .email("testuser@example.com")
                 .build();
 
         String serializedInput = mapper.writeValueAsString(input);
@@ -328,7 +341,7 @@ class AuthControllerTest {
 
     @Test
     void promoteUserToAdminOk() throws Exception {
-        User testUser = userRepository.findByEmail("yordanovtodor281@gmail.com").get();
+        User testUser = userRepository.findByEmail("testuser@example.com").get();
         String authHeader = "Bearer " + jwtService.generateToken(testUser);
         String user1Id = userRepository.findAll().get(1).getId().toString();
 
@@ -368,7 +381,7 @@ class AuthControllerTest {
         User user = User.builder()
                 .role(Role.ADMIN)
                 .username("ivan716")
-                .email("zit960003@gmail.com")
+                .email("testuser3@example.com")
                 .password(passwordEncoder.encode("1234ABCDefgh****"))
                 .firstName("Иван")
                 .lastName("Петров")
@@ -379,7 +392,7 @@ class AuthControllerTest {
 
         User savedUser = userRepository.save(user);
 
-        User testUser = userRepository.findByEmail("yordanovtodor281@gmail.com").get();
+        User testUser = userRepository.findByEmail("testuser@example.com").get();
         String authHeader = "Bearer " + jwtService.generateToken(testUser);
 
         DemoteInput input = DemoteInput.builder()
@@ -401,7 +414,7 @@ class AuthControllerTest {
         User user = User.builder()
                 .role(Role.ADMIN)
                 .username("ivan716")
-                .email("zit960003@gmail.com")
+                .email("testuser3@example.com")
                 .password(passwordEncoder.encode("1234ABCDefgh****"))
                 .firstName("Иван")
                 .lastName("Петров")
@@ -427,7 +440,7 @@ class AuthControllerTest {
 
     @Test
     void logoutOk() throws Exception {
-        User testUser = userRepository.findByEmail("yordanovtodor281@gmail.com").get();
+        User testUser = userRepository.findByEmail("testuser@example.com").get();
         String authHeader = "Bearer " + jwtService.generateToken(testUser);
 
         mvc.perform(post(RestApiRoutes.LOGOUT)
