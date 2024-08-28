@@ -22,7 +22,7 @@ public class AccountCode {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "code", nullable = false,unique = true, length = 12)
+    @Column(name = "code", nullable = false, unique = true, length = 12)
     private String code;
 
     @Column(name = "email", nullable = false, unique = true, length = 64)

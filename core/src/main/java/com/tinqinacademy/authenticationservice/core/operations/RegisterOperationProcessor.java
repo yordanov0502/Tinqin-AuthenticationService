@@ -7,12 +7,12 @@ import com.tinqinacademy.authenticationservice.api.operations.register.RegisterO
 import com.tinqinacademy.authenticationservice.api.operations.register.RegisterOutput;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
 import com.tinqinacademy.authenticationservice.core.utils.ContentGenerator;
-import com.tinqinacademy.authenticationservice.core.utils.EmailService;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.AccountCode;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.repository.AccountCodeRepository;
 import com.tinqinacademy.authenticationservice.persistence.repository.UserRepository;
+import com.tinqinacademy.emailservice.restexport.EmailRestExport;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import jakarta.validation.Validator;
@@ -21,7 +21,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.tinqinacademy.emailservice.api.operations.sendcodeforemailverification.SendCodeForEmailVerificationInput;
 @Slf4j
 @Service
 public class RegisterOperationProcessor extends BaseOperationProcessor implements RegisterOperation {
@@ -29,16 +29,16 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AccountCodeRepository accountCodeRepository;
-    private final EmailService emailService;
     private final ContentGenerator contentGenerator;
+    private final EmailRestExport emailClient;
 
-    public RegisterOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository, AccountCodeRepository accountCodeRepository, EmailService emailService, ContentGenerator contentGenerator) {
+    public RegisterOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository, AccountCodeRepository accountCodeRepository, ContentGenerator contentGenerator, EmailRestExport emailClient) {
         super(conversionService, exceptionService, validator);
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.accountCodeRepository = accountCodeRepository;
-        this.emailService = emailService;
         this.contentGenerator = contentGenerator;
+        this.emailClient = emailClient;
     }
 
     @Transactional
@@ -62,7 +62,13 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
                             .email(newUser.getEmail())
                             .build();
                     accountCodeRepository.save(accountConfirmationCode);
-                    emailService.sendEmailForAccountActivation(newUser.getFirstName(), newUser.getEmail(), generatedCode);
+
+                    SendCodeForEmailVerificationInput emailInput = SendCodeForEmailVerificationInput.builder()
+                            .userFirstName(user.getFirstName())
+                            .email(user.getEmail())
+                            .codeForEmailVerification(generatedCode)
+                            .build();
+                    emailClient.sendCodeForEmailVerification(emailInput);
 
                     RegisterOutput output = RegisterOutput.builder()
                             .id(newUser.getId().toString())
