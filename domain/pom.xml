@@ -17,6 +17,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>com.tinqinacademy.email-service</groupId>
+            <artifactId>restexport</artifactId>
+            <version>${email-service.restexport.version}</version>
+        </dependency>
+
     </dependencies>
 
 

@@ -6,11 +6,12 @@ import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.Re
 import com.tinqinacademy.authenticationservice.api.operations.recoverpassword.RecoverPasswordOutput;
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
 import com.tinqinacademy.authenticationservice.core.utils.ContentGenerator;
-import com.tinqinacademy.authenticationservice.core.utils.EmailService;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
 import com.tinqinacademy.authenticationservice.core.utils.PasswordRecoveryCodesCacheSerivce;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.repository.UserRepository;
+import com.tinqinacademy.emailservice.api.operations.sendpassrecoverycode.SendPassRecoveryCodeInput;
+import com.tinqinacademy.emailservice.restexport.EmailRestExport;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import jakarta.validation.Validator;
@@ -27,14 +28,14 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
 
     private final UserRepository userRepository;
     private final ContentGenerator contentGenerator;
-    private final EmailService emailService;
+    private final EmailRestExport emailClient;
     private final PasswordRecoveryCodesCacheSerivce passwordRecoveryCodesCacheSerivce;
 
-    public RecoverPasswordOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, UserRepository userRepository, ContentGenerator contentGenerator, EmailService emailService, PasswordRecoveryCodesCacheSerivce passwordRecoveryCodesCacheSerivce) {
+    public RecoverPasswordOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, UserRepository userRepository, ContentGenerator contentGenerator, EmailRestExport emailClient, PasswordRecoveryCodesCacheSerivce passwordRecoveryCodesCacheSerivce) {
         super(conversionService, exceptionService, validator);
         this.userRepository = userRepository;
         this.contentGenerator = contentGenerator;
-        this.emailService = emailService;
+        this.emailClient = emailClient;
         this.passwordRecoveryCodesCacheSerivce = passwordRecoveryCodesCacheSerivce;
     }
 
@@ -48,14 +49,16 @@ public class RecoverPasswordOperationProcessor extends BaseOperationProcessor im
                     Optional<User> user = checkForExistingEmail(input.getEmail());
 
                     if (user.isPresent()) {
-
                         String passwordRecoveryCode = contentGenerator.generatePasswordRecoveryCode();
-                        passwordRecoveryCodesCacheSerivce.addToCache(user.get().getEmail(),passwordRecoveryCode);
 
-                        emailService.sendEmailWithPasswordRecoveryCode(
-                                user.get().getFirstName(),
-                                user.get().getEmail(),
-                                passwordRecoveryCode);
+                        SendPassRecoveryCodeInput emailInput = SendPassRecoveryCodeInput.builder()
+                                .userFirstName(user.get().getFirstName())
+                                .email(user.get().getEmail())
+                                .passwordRecoveryCode(passwordRecoveryCode)
+                                .build();
+                        emailClient.sendPasswordRecoveryCode(emailInput);
+
+                        passwordRecoveryCodesCacheSerivce.addToCache(user.get().getEmail(),passwordRecoveryCode);
                     }
 
                     RecoverPasswordOutput output = RecoverPasswordOutput.builder().build();
