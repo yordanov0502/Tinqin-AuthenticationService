@@ -8,6 +8,8 @@ import com.tinqinacademy.authenticationservice.api.operations.register.RegisterO
 import com.tinqinacademy.authenticationservice.core.exceptions.ExceptionService;
 import com.tinqinacademy.authenticationservice.core.utils.ContentGenerator;
 import com.tinqinacademy.authenticationservice.core.utils.LoggingUtils;
+import com.tinqinacademy.authenticationservice.kafka.model.EmailMessage;
+import com.tinqinacademy.authenticationservice.kafka.producer.KafkaEmailProducer;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.AccountCode;
 import com.tinqinacademy.authenticationservice.persistence.model.entity.User;
 import com.tinqinacademy.authenticationservice.persistence.repository.AccountCodeRepository;
@@ -31,14 +33,16 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
     private final AccountCodeRepository accountCodeRepository;
     private final ContentGenerator contentGenerator;
     private final EmailRestExport emailClient;
+    private final KafkaEmailProducer kafkaEmailProducer;
 
-    public RegisterOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository, AccountCodeRepository accountCodeRepository, ContentGenerator contentGenerator, EmailRestExport emailClient) {
+    public RegisterOperationProcessor(ConversionService conversionService, ExceptionService exceptionService, Validator validator, PasswordEncoder passwordEncoder, UserRepository userRepository, AccountCodeRepository accountCodeRepository, ContentGenerator contentGenerator, EmailRestExport emailClient, KafkaEmailProducer kafkaEmailProducer) {
         super(conversionService, exceptionService, validator);
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.accountCodeRepository = accountCodeRepository;
         this.contentGenerator = contentGenerator;
         this.emailClient = emailClient;
+        this.kafkaEmailProducer = kafkaEmailProducer;
     }
 
     @Transactional
@@ -63,12 +67,14 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
                             .build();
                     accountCodeRepository.save(accountConfirmationCode);
 
-                    SendCodeForEmailVerificationInput emailInput = SendCodeForEmailVerificationInput.builder()
-                            .userFirstName(user.getFirstName())
-                            .email(user.getEmail())
-                            .codeForEmailVerification(generatedCode)
-                            .build();
-                    emailClient.sendCodeForEmailVerification(emailInput);
+//                    SendCodeForEmailVerificationInput emailInput = SendCodeForEmailVerificationInput.builder()
+//                            .userFirstName(user.getFirstName())
+//                            .email(user.getEmail())
+//                            .codeForEmailVerification(generatedCode)
+//                            .build();
+                    //emailClient.sendCodeForEmailVerification(emailInput);
+
+                    sendActivationCode(user,generatedCode);
 
                     RegisterOutput output = RegisterOutput.builder()
                             .id(newUser.getId().toString())
@@ -80,6 +86,15 @@ public class RegisterOperationProcessor extends BaseOperationProcessor implement
                 })
                 .toEither()
                 .mapLeft(exceptionService::handle);
+    }
+
+    private void sendActivationCode(User user, String activationCode) {
+        EmailMessage message = EmailMessage.builder()
+                .to(user.getFirstName())
+                .email(user.getEmail())
+                .content(activationCode)
+                .build();
+        kafkaEmailProducer.sendEmailMessage(message);
     }
 
     private void checkForExistingUsername(String username) {
